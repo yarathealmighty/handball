@@ -129,7 +129,7 @@ def run_hf_action_detection(video_path: str, model_id: str, threshold: float = 0
 	pipeline = try_import_transformers()
 	if pipeline is None:
 		raise RuntimeError("transformers is not installed or failed to import.")
-	# Strictly use video-classification pipeline and pass a list of PIL frames (clip)
+	# Strictly use video-classification pipeline and pass a dict with "video": clip
 	try:
 		clf = pipeline("video-classification", model=model_id, top_k=None)
 	except Exception as e:
@@ -141,7 +141,7 @@ def run_hf_action_detection(video_path: str, model_id: str, threshold: float = 0
 		clip = extract_clip_around_index(video_path, frame_idx, num_frames=8, stride=2)
 		if not clip:
 			continue
-		result = clf(clip)
+		result = clf({"video": clip})
 		# result: list of dicts [{'label': 'class', 'score': 0.9}, ...]
 		if isinstance(result, list):
 			for item in result:
